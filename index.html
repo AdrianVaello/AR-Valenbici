@@ -92,6 +92,9 @@
         },
 
         getPOIS: function (lat, long) {
+          var url =
+            "https://valencia.opendatasoft.com/api/records/1.0/search/?dataset=valenbisi-disponibilitat-valenbisi-dsiponibilidad&q=&geofilter.distance=39.47402866521183%2C-0.3762567909771192%2C1000";
+
           const dist = 0.01;
           const west = long - dist;
           const east = long + dist;
@@ -99,19 +102,19 @@
           const north = lat + dist;
 
           // Download pois data from open street maps
-          fetch(
-            `https://valencia.opendatasoft.com/api/records/1.0/search/?dataset=valenbisi-disponibilitat-valenbisi-dsiponibilidad&q=&geofilter.distance=39.47402866521183%2C-0.3762567909771192%2C1000`
-          ).then((response) => {
+          fetch(url).then((response) => {
+            console.log(response);
+
             response.json().then((pois) => {
               cont = 0;
-              console.log(response);
-              console.log("POIS" + pois.features);
+              console.log(pois.records[0]);
 
               // for each feature create a POI
-              pois.features.map((feature, index) => {
-                //console.log(feature.properties);
-                if (feature.properties.hasOwnProperty("name")) {
+              pois.records.map((feature, index) => {
+                if (feature.fields.hasOwnProperty("name")) {
                   // Create gps-entity-place
+                  //console.log(feature.datasetid);
+
                   const poi = document.createElement("a-entity");
                   poi.setAttribute("gps-new-entity-place", {
                     latitude: feature.geometry.coordinates[1],
@@ -140,7 +143,7 @@
                   // Add text
                   const text = document.createElement("a-text");
                   text.setAttribute("position", { x: 0, y: 9, z: 3 });
-                  text.setAttribute("value", feature.properties.name);
+                  text.setAttribute("value", feature.fields.name);
                   text.setAttribute("align", "center");
                   text.setAttribute("width", 40);
                   text.setAttribute("wrapcount", 20);
